@@ -7,11 +7,11 @@
   <link rel="stylesheet" href="shared/global.css" />
 </head>
 <body>
-  <!-- Page content (blurred when modal is open) -->
+  <!-- Page content that will blur when modal is open -->
   <div id="pageContent">
     <header class="site-header">
       <h1>AutoX Services</h1>
-      <img src="shared/9B6E1960-7841-4015-BF01-555EA0EEF7B8.jpeg" alt="AutoX Banner" class="header-image" />
+      <img src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg" alt="AutoX Banner" class="header-image" />
     </header>
 
     <main class="services-container">
@@ -23,7 +23,7 @@
     </main>
   </div>
 
-  <!-- Modal for Login/Register -->
+  <!-- Modal -->
   <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="modal-backdrop"></div>
 
@@ -53,7 +53,26 @@
     </div>
   </div>
 
+  <!-- Toast container -->
+  <div id="toastContainer" class="toast-container"></div>
+
   <script>
+    // Toast notification function
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+
+      const container = document.getElementById('toastContainer');
+      container.appendChild(toast);
+
+      // Auto-remove after 3 seconds with fade out
+      setTimeout(() => {
+        toast.classList.add('hide');
+        toast.addEventListener('transitionend', () => toast.remove());
+      }, 3000);
+    }
+
     const cards = document.querySelectorAll('.service-card');
     const authModal = document.getElementById('authModal');
     const authForm = document.getElementById('authForm');
@@ -93,7 +112,7 @@
       const email = document.getElementById('email').value.trim();
 
       if (!email) {
-        alert('Please enter a valid email address.');
+        showToast('Please enter a valid email address.', 'error');
         return;
       }
 
@@ -105,19 +124,19 @@
         });
 
         if (response.ok) {
-          alert(`Verification code sent to ${email}. Please check your inbox.`);
+          showToast(`Verification code sent to ${email}`, 'success');
           authModal.classList.add('hidden');
           document.body.classList.remove('modal-open');
         } else {
           const data = await response.json();
-          alert(data.error || 'Failed to send verification code.');
+          showToast(data.error || 'Failed to send verification code.', 'error');
         }
       } catch (error) {
-        alert('Network error. Please try again later.');
+        showToast('Network error. Please try again later.', 'error');
       }
     });
 
-    // Close modal on button click
+    // Close modal on close button click
     closeModalBtn.addEventListener('click', () => {
       authModal.classList.add('hidden');
       document.body.classList.remove('modal-open');
