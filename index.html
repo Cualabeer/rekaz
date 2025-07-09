@@ -7,20 +7,23 @@
   <link rel="stylesheet" href="shared/global.css" />
 </head>
 <body>
-  <header class="site-header">
-    <h1>AutoX Services</h1>
-    <img src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg" alt="AutoX Banner" class="header-image" />
-  </header>
+  <!-- Blur wrapper -->
+  <div id="pageContent">
+    <header class="site-header">
+      <h1>AutoX Services</h1>
+      <img src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg" alt="AutoX Banner" class="header-image" />
+    </header>
 
-  <main class="services-container">
-    <div class="service-card" data-service="Recovery">🚗 Recovery</div>
-    <div class="service-card" data-service="Battery">🔋 Battery Fitting</div>
-    <div class="service-card" data-service="Service">🛠️ Full Service</div>
-    <div class="service-card" data-service="Brakes">🛑 Brake Check</div>
-    <div class="service-card" data-service="AC">❄️ AC Diagnostics</div>
-  </main>
+    <main class="services-container">
+      <div class="service-card" data-service="Recovery">🚗 Recovery</div>
+      <div class="service-card" data-service="Battery">🔋 Battery Fitting</div>
+      <div class="service-card" data-service="Service">🛠️ Full Service</div>
+      <div class="service-card" data-service="Brakes">🛑 Brake Check</div>
+      <div class="service-card" data-service="AC">❄️ AC Diagnostics</div>
+    </main>
+  </div>
 
-  <!-- Email Login/Register Modal -->
+  <!-- Modal -->
   <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="modal-backdrop"></div>
 
@@ -50,6 +53,7 @@
     </div>
   </div>
 
+  <!-- Script -->
   <script>
     const cards = document.querySelectorAll('.service-card');
     const authModal = document.getElementById('authModal');
@@ -113,7 +117,7 @@
       }
     });
 
-    // Close modal on click
+    // Close modal
     closeModalBtn.addEventListener('click', () => {
       authModal.classList.add('hidden');
       document.body.classList.remove('modal-open');
