@@ -21,34 +21,34 @@
   </main>
 
   <!-- Email Login/Register Modal -->
-<div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-  <div class="modal-backdrop"></div>
+  <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-backdrop"></div>
 
-  <div class="modal-content slide-up">
-    <button class="close-btn" id="closeModalBtn" aria-label="Close modal">&times;</button>
+    <div class="modal-content slide-up">
+      <button class="close-btn" id="closeModalBtn" aria-label="Close modal">&times;</button>
 
-    <h2 id="authTitle">Login</h2>
+      <h2 id="authTitle">Login</h2>
 
-    <form id="authForm">
-      <label for="email">Email address:</label>
-      <input
-        type="email"
-        id="email"
-        name="email"
-        placeholder="you@example.com"
-        autocomplete="email"
-        required
-      />
-      <button type="submit" id="authSubmit">Send Code</button>
-      <p class="note">We'll email you a 6-digit code.</p>
-    </form>
+      <form id="authForm">
+        <label for="email">Email address:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+        <button type="submit" id="authSubmit">Send Code</button>
+        <p class="note">We'll email you a 6-digit code.</p>
+      </form>
 
-    <div class="auth-switch">
-      <p id="authSwitchText">Don't have an account?</p>
-      <button id="authSwitchBtn" type="button">Register</button>
+      <div class="auth-switch">
+        <p id="authSwitchText">Don't have an account?</p>
+        <button id="authSwitchBtn" type="button">Register</button>
+      </div>
     </div>
   </div>
-</div>
 
   <script>
     const cards = document.querySelectorAll('.service-card');
@@ -58,6 +58,7 @@
     const authSubmit = document.getElementById('authSubmit');
     const authSwitchText = document.getElementById('authSwitchText');
     const authSwitchBtn = document.getElementById('authSwitchBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
 
     let selectedService = null;
     let isRegistering = false;
@@ -67,6 +68,7 @@
       card.addEventListener('click', () => {
         selectedService = card.dataset.service;
         authModal.classList.remove('hidden');
+        document.body.classList.add('modal-open');
       });
     });
 
@@ -101,6 +103,7 @@
         if (response.ok) {
           alert(`Verification code sent to ${email}. Please check your email.`);
           authModal.classList.add('hidden');
+          document.body.classList.remove('modal-open');
         } else {
           const data = await response.json();
           alert(data.error || 'Failed to send verification code.');
@@ -108,6 +111,12 @@
       } catch (error) {
         alert('Network error. Please try again later.');
       }
+    });
+
+    // Close modal on click
+    closeModalBtn.addEventListener('click', () => {
+      authModal.classList.add('hidden');
+      document.body.classList.remove('modal-open');
     });
   </script>
 </body>
