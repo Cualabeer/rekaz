@@ -21,30 +21,34 @@
   </main>
 
   <!-- Email Login/Register Modal -->
-  <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-    <div class="modal-content">
-      <h2 id="authTitle">Login</h2>
+<div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="modal-backdrop"></div>
 
-      <form id="authForm">
-        <label for="email">Email address:</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="you@example.com"
-          autocomplete="email"
-          required
-        />
-        <button type="submit" id="authSubmit">Send Code</button>
-        <p class="note">We'll email you a 6-digit code.</p>
-      </form>
+  <div class="modal-content slide-up">
+    <button class="close-btn" id="closeModalBtn" aria-label="Close modal">&times;</button>
 
-      <div class="auth-switch">
-        <p id="authSwitchText">Don't have an account?</p>
-        <button id="authSwitchBtn" type="button">Register</button>
-      </div>
+    <h2 id="authTitle">Login</h2>
+
+    <form id="authForm">
+      <label for="email">Email address:</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        required
+      />
+      <button type="submit" id="authSubmit">Send Code</button>
+      <p class="note">We'll email you a 6-digit code.</p>
+    </form>
+
+    <div class="auth-switch">
+      <p id="authSwitchText">Don't have an account?</p>
+      <button id="authSwitchBtn" type="button">Register</button>
     </div>
   </div>
+</div>
 
   <script>
     const cards = document.querySelectorAll('.service-card');
