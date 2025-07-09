@@ -4,27 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AutoX Services</title>
-  <!-- Link to shared global CSS file -->
   <link rel="stylesheet" href="shared/global.css" />
 </head>
 <body>
-  <!--
-    Main page content.
-    Wrapped in #pageContent so it can be blurred
-    when modal is open via CSS filter.
-  -->
+  <!-- Dark Mode Toggle -->
+  <button id="darkModeToggle" class="dark-toggle" aria-label="Toggle Dark Mode">🌙</button>
+
+  <!-- Page Content -->
   <div id="pageContent">
     <header class="site-header">
       <h1>AutoX Services</h1>
       <img
-        src="shared/9B6E1960-7841-4015-BF01-555EA0EEF7B8.jpeg"
+        src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg"
         alt="AutoX Banner"
         class="header-image"
       />
     </header>
 
     <main class="services-container">
-      <!-- Service cards with data-service attributes for JS -->
       <div class="service-card" data-service="Recovery">🚗 Recovery</div>
       <div class="service-card" data-service="Battery">🔋 Battery Fitting</div>
       <div class="service-card" data-service="Service">🛠️ Full Service</div>
@@ -33,45 +30,19 @@
     </main>
   </div>
 
-  <!--
-    Authentication modal (login/register).
-    Initially hidden with class "hidden".
-    Modal backdrop covers entire screen and blurs background.
-  -->
-  <div
-    id="authModal"
-    class="modal hidden"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="authTitle"
-  >
-    <!-- Semi-transparent dark backdrop with blur -->
+  <!-- Email Login/Register Modal -->
+  <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="modal-backdrop"></div>
-
-    <!-- Modal content box -->
     <div class="modal-content slide-up">
-      <!-- Close button with accessible label -->
       <button class="close-btn" id="closeModalBtn" aria-label="Close modal">&times;</button>
-
-      <!-- Modal heading dynamically changes Login/Register -->
       <h2 id="authTitle">Login</h2>
-
-      <!-- Email login/register form -->
       <form id="authForm">
         <label for="email">Email address:</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="you@example.com"
-          autocomplete="email"
-          required
-        />
+        <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+        <p class="email-feedback" id="emailFeedback"></p>
         <button type="submit" id="authSubmit">Send Code</button>
         <p class="note">We'll email you a 6-digit code.</p>
       </form>
-
-      <!-- Switch between login and register -->
       <div class="auth-switch">
         <p id="authSwitchText">Don't have an account?</p>
         <button id="authSwitchBtn" type="button">Register</button>
@@ -79,50 +50,84 @@
     </div>
   </div>
 
-  <!-- Toast container: To show temporary messages in bottom-right corner -->
+  <!-- Verification Modal -->
+  <div id="verifyModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="verifyTitle">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content slide-up">
+      <button class="close-btn" id="closeVerifyModalBtn" aria-label="Close modal">&times;</button>
+      <h2 id="verifyTitle">Enter Verification Code</h2>
+      <form id="verifyForm">
+        <label for="codeInput">6-digit code:</label>
+        <input type="text" id="codeInput" name="codeInput" placeholder="Enter code" maxlength="6" pattern="\d{6}" required />
+        <button type="submit" id="verifySubmit">Verify Code</button>
+      </form>
+      <p class="note">Please check your email for the code.</p>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
   <div id="toastContainer" class="toast-container"></div>
 
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="spinner hidden" aria-hidden="true"></div>
+
+  <!-- Scripts -->
   <script>
-    // Toast notification function
-    // Creates a toast div with message and optional type (info, success, error)
-    // Auto-removes toast after 3 seconds with fade animation
+    // === State & Elements ===
+    const authModal = document.getElementById('authModal');
+    const verifyModal = document.getElementById('verifyModal');
+    const cards = document.querySelectorAll('.service-card');
+    const authForm = document.getElementById('authForm');
+    const verifyForm = document.getElementById('verifyForm');
+    const emailInput = document.getElementById('email');
+    const emailFeedback = document.getElementById('emailFeedback');
+    const spinner = document.getElementById('loadingSpinner');
+    const darkToggle = document.getElementById('darkModeToggle');
+
+    let selectedService = null;
+    let isRegistering = false;
+    let currentEmail = '';
+
+    // === Toast Notification ===
     function showToast(message, type = 'info') {
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
       toast.textContent = message;
-
-      const container = document.getElementById('toastContainer');
-      container.appendChild(toast);
-
-      // Remove after 3 seconds with fade out
+      document.getElementById('toastContainer').appendChild(toast);
       setTimeout(() => {
         toast.classList.add('hide');
         toast.addEventListener('transitionend', () => toast.remove());
       }, 3000);
     }
 
-    // Grab all service cards from the page
-    const cards = document.querySelectorAll('.service-card');
+    // === Loading Spinner ===
+    function toggleSpinner(show) {
+      spinner.classList.toggle('hidden', !show);
+    }
 
-    // Grab modal and form elements
-    const authModal = document.getElementById('authModal');
-    const authForm = document.getElementById('authForm');
-    const authTitle = document.getElementById('authTitle');
-    const authSubmit = document.getElementById('authSubmit');
-    const authSwitchText = document.getElementById('authSwitchText');
-    const authSwitchBtn = document.getElementById('authSwitchBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const modalBackdrop = document.querySelector('.modal-backdrop');
+    // === Modal Controls ===
+    function closeModal(modal) {
+      modal.classList.add('hidden');
+      document.body.classList.remove('modal-open');
+    }
 
-    // Track the selected service and login/register mode
-    let selectedService = null;
-    let isRegistering = false;
+    document.getElementById('closeModalBtn').onclick = () => closeModal(authModal);
+    document.getElementById('closeVerifyModalBtn').onclick = () => closeModal(verifyModal);
+    authModal.querySelector('.modal-backdrop').onclick = () => closeModal(authModal);
+    verifyModal.querySelector('.modal-backdrop').onclick = () => closeModal(verifyModal);
 
-    // When a service card is clicked:
-    // - save selected service
-    // - show modal by removing "hidden"
-    // - add class to body to blur page content and disable scrolling
+    // === Card Animations on Scroll ===
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
     cards.forEach(card => {
+      observer.observe(card);
       card.addEventListener('click', () => {
         selectedService = card.dataset.service;
         authModal.classList.remove('hidden');
@@ -130,62 +135,95 @@
       });
     });
 
-    // Toggle login/register form mode and update button texts and labels
-    authSwitchBtn.addEventListener('click', () => {
-      isRegistering = !isRegistering;
-      authTitle.textContent = isRegistering ? 'Register' : 'Login';
-      authSubmit.textContent = isRegistering ? 'Register & Send Code' : 'Send Code';
-      authSwitchText.textContent = isRegistering
-        ? 'Already have an account?'
-        : "Don't have an account?";
-      authSwitchBtn.textContent = isRegistering ? 'Login' : 'Register';
+    // === Email Live Validation ===
+    emailInput.addEventListener('input', () => {
+      const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
+      emailFeedback.textContent = isValid ? '✓ Valid email' : '';
+      emailFeedback.style.color = isValid ? 'green' : '';
     });
 
-    // Handle form submission:
-    // - Validate email
-    // - Send POST request to backend API
-    // - Show success or error toast
-    // - Close modal on success
+    // === Toggle Login/Register Mode ===
+    document.getElementById('authSwitchBtn').addEventListener('click', () => {
+      isRegistering = !isRegistering;
+      document.getElementById('authTitle').textContent = isRegistering ? 'Register' : 'Login';
+      document.getElementById('authSubmit').textContent = isRegistering ? 'Register & Send Code' : 'Send Code';
+      document.getElementById('authSwitchText').textContent = isRegistering ? 'Already have an account?' : "Don't have an account?";
+      document.getElementById('authSwitchBtn').textContent = isRegistering ? 'Login' : 'Register';
+    });
+
+    // === Send Email Code ===
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-
-      if (!email) {
-        showToast('Please enter a valid email address.', 'error');
-        return;
-      }
+      const email = emailInput.value.trim();
+      if (!email) return showToast('Please enter a valid email.', 'error');
 
       try {
-        // Replace the URL with your backend endpoint for sending email codes
-        const response = await fetch('https://your-backend-domain.com/api/send-code', {
+        toggleSpinner(true);
+        const res = await fetch('http://localhost:3000/api/send-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, register: isRegistering })
         });
-
-        if (response.ok) {
-          showToast(`Verification code sent to ${email}`, 'success');
+        const data = await res.json();
+        if (res.ok) {
+          showToast(`Code sent to ${email}`, 'success');
+          currentEmail = email;
           authModal.classList.add('hidden');
-          document.body.classList.remove('modal-open');
+          verifyModal.classList.remove('hidden');
         } else {
-          const data = await response.json();
-          showToast(data.error || 'Failed to send verification code.', 'error');
+          showToast(data.error || 'Error sending code.', 'error');
         }
-      } catch (error) {
-        showToast('Network error. Please try again later.', 'error');
+      } catch {
+        showToast('Network error. Try again.', 'error');
+      } finally {
+        toggleSpinner(false);
       }
     });
 
-    // Close modal on close button click
-    closeModalBtn.addEventListener('click', () => {
-      authModal.classList.add('hidden');
-      document.body.classList.remove('modal-open');
+    // === Verify 6-digit Code ===
+    verifyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = document.getElementById('codeInput').value.trim();
+      if (!/^\d{6}$/.test(code)) return showToast('Invalid code format.', 'error');
+
+      try {
+        toggleSpinner(true);
+        const res = await fetch('http://localhost:3000/api/verify-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentEmail, code })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Verified! You are now logged in.', 'success');
+          verifyModal.classList.add('hidden');
+        } else {
+          showToast(data.error || 'Invalid code.', 'error');
+        }
+      } catch {
+        showToast('Could not verify code.', 'error');
+      } finally {
+        toggleSpinner(false);
+      }
     });
 
-    // Close modal on clicking the backdrop outside modal content
-    modalBackdrop.addEventListener('click', () => {
-      authModal.classList.add('hidden');
-      document.body.classList.remove('modal-open');
+    // === Dark Mode Toggle ===
+    const darkModeClass = 'dark-mode';
+    function setDarkMode(enabled) {
+      document.body.classList.toggle(darkModeClass, enabled);
+      localStorage.setItem('darkMode', enabled ? 'true' : 'false');
+      darkToggle.textContent = enabled ? '☀️' : '🌙';
+    }
+
+    darkToggle.addEventListener('click', () => {
+      const enabled = document.body.classList.toggle(darkModeClass);
+      setDarkMode(enabled);
+    });
+
+    // Apply dark mode on load
+    window.addEventListener('DOMContentLoaded', () => {
+      const darkPref = localStorage.getItem('darkMode') === 'true';
+      setDarkMode(darkPref);
     });
   </script>
 </body>
