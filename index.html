@@ -4,17 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AutoX Services</title>
+  <!-- Link to shared global CSS file -->
   <link rel="stylesheet" href="shared/global.css" />
 </head>
 <body>
-  <!-- Page content that will blur when modal is open -->
+  <!--
+    Main page content.
+    Wrapped in #pageContent so it can be blurred
+    when modal is open via CSS filter.
+  -->
   <div id="pageContent">
     <header class="site-header">
       <h1>AutoX Services</h1>
-      <img src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg" alt="AutoX Banner" class="header-image" />
+      <img
+        src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg"
+        alt="AutoX Banner"
+        class="header-image"
+      />
     </header>
 
     <main class="services-container">
+      <!-- Service cards with data-service attributes for JS -->
       <div class="service-card" data-service="Recovery">🚗 Recovery</div>
       <div class="service-card" data-service="Battery">🔋 Battery Fitting</div>
       <div class="service-card" data-service="Service">🛠️ Full Service</div>
@@ -23,15 +33,30 @@
     </main>
   </div>
 
-  <!-- Modal -->
-  <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <!--
+    Authentication modal (login/register).
+    Initially hidden with class "hidden".
+    Modal backdrop covers entire screen and blurs background.
+  -->
+  <div
+    id="authModal"
+    class="modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="authTitle"
+  >
+    <!-- Semi-transparent dark backdrop with blur -->
     <div class="modal-backdrop"></div>
 
+    <!-- Modal content box -->
     <div class="modal-content slide-up">
+      <!-- Close button with accessible label -->
       <button class="close-btn" id="closeModalBtn" aria-label="Close modal">&times;</button>
 
+      <!-- Modal heading dynamically changes Login/Register -->
       <h2 id="authTitle">Login</h2>
 
+      <!-- Email login/register form -->
       <form id="authForm">
         <label for="email">Email address:</label>
         <input
@@ -46,6 +71,7 @@
         <p class="note">We'll email you a 6-digit code.</p>
       </form>
 
+      <!-- Switch between login and register -->
       <div class="auth-switch">
         <p id="authSwitchText">Don't have an account?</p>
         <button id="authSwitchBtn" type="button">Register</button>
@@ -53,11 +79,13 @@
     </div>
   </div>
 
-  <!-- Toast container -->
+  <!-- Toast container: To show temporary messages in bottom-right corner -->
   <div id="toastContainer" class="toast-container"></div>
 
   <script>
     // Toast notification function
+    // Creates a toast div with message and optional type (info, success, error)
+    // Auto-removes toast after 3 seconds with fade animation
     function showToast(message, type = 'info') {
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
@@ -66,14 +94,17 @@
       const container = document.getElementById('toastContainer');
       container.appendChild(toast);
 
-      // Auto-remove after 3 seconds with fade out
+      // Remove after 3 seconds with fade out
       setTimeout(() => {
         toast.classList.add('hide');
         toast.addEventListener('transitionend', () => toast.remove());
       }, 3000);
     }
 
+    // Grab all service cards from the page
     const cards = document.querySelectorAll('.service-card');
+
+    // Grab modal and form elements
     const authModal = document.getElementById('authModal');
     const authForm = document.getElementById('authForm');
     const authTitle = document.getElementById('authTitle');
@@ -83,10 +114,14 @@
     const closeModalBtn = document.getElementById('closeModalBtn');
     const modalBackdrop = document.querySelector('.modal-backdrop');
 
+    // Track the selected service and login/register mode
     let selectedService = null;
     let isRegistering = false;
 
-    // Open modal on service card click
+    // When a service card is clicked:
+    // - save selected service
+    // - show modal by removing "hidden"
+    // - add class to body to blur page content and disable scrolling
     cards.forEach(card => {
       card.addEventListener('click', () => {
         selectedService = card.dataset.service;
@@ -95,7 +130,7 @@
       });
     });
 
-    // Toggle login/register mode
+    // Toggle login/register form mode and update button texts and labels
     authSwitchBtn.addEventListener('click', () => {
       isRegistering = !isRegistering;
       authTitle.textContent = isRegistering ? 'Register' : 'Login';
@@ -106,7 +141,11 @@
       authSwitchBtn.textContent = isRegistering ? 'Login' : 'Register';
     });
 
-    // Submit form and send email code
+    // Handle form submission:
+    // - Validate email
+    // - Send POST request to backend API
+    // - Show success or error toast
+    // - Close modal on success
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
@@ -117,6 +156,7 @@
       }
 
       try {
+        // Replace the URL with your backend endpoint for sending email codes
         const response = await fetch('https://your-backend-domain.com/api/send-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -142,7 +182,7 @@
       document.body.classList.remove('modal-open');
     });
 
-    // Close modal on backdrop click
+    // Close modal on clicking the backdrop outside modal content
     modalBackdrop.addEventListener('click', () => {
       authModal.classList.add('hidden');
       document.body.classList.remove('modal-open');
