@@ -8,7 +8,8 @@
 </head>
 <body>
   <header class="site-header">
-    AutoX Services
+    <h1>AutoX Services</h1>
+    <img src="shared/header-mobile.jpg" alt="AutoX Banner" class="header-image" />
   </header>
 
   <main class="services-container">
@@ -57,7 +58,7 @@
     let selectedService = null;
     let isRegistering = false;
 
-    // Open modal when a service card is clicked
+    // Open modal on service click
     cards.forEach(card => {
       card.addEventListener('click', () => {
         selectedService = card.dataset.service;
@@ -65,7 +66,7 @@
       });
     });
 
-    // Toggle between Login and Register modes
+    // Switch between Login/Register
     authSwitchBtn.addEventListener('click', () => {
       isRegistering = !isRegistering;
       authTitle.textContent = isRegistering ? 'Register' : 'Login';
@@ -76,7 +77,7 @@
       authSwitchBtn.textContent = isRegistering ? 'Login' : 'Register';
     });
 
-    // Handle form submission to send verification code
+    // Send email code
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
@@ -95,12 +96,10 @@
 
         if (response.ok) {
           alert(`Verification code sent to ${email}. Please check your email.`);
-          // Here you can show a code input modal or redirect to a verification page
-          // For now, just close the modal
           authModal.classList.add('hidden');
         } else {
-          const errorData = await response.json();
-          alert(errorData.error || 'Failed to send verification code. Please try again.');
+          const data = await response.json();
+          alert(data.error || 'Failed to send verification code.');
         }
       } catch (error) {
         alert('Network error. Please try again later.');
