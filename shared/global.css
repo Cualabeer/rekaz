@@ -1,10 +1,12 @@
-/* === Base Reset === */
+/* === Base Reset and Setup === */
+/* Remove default margin/padding and set box-sizing for all elements */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Base body styling: font, background, color, line height */
 body {
   font-family: system-ui, sans-serif;
   background-color: #fff;
@@ -13,106 +15,117 @@ body {
   padding: 1rem;
 }
 
-/* Disable scroll + blur background when modal is open */
+/* === Modal Open State === */
+/* When modal is open, disable scrolling on body */
 body.modal-open {
   overflow: hidden;
   height: 100vh;
 }
 
+/* When modal is open, blur and disable interaction on main page content */
 body.modal-open #pageContent {
-  filter: blur(6px);
-  pointer-events: none;
-  user-select: none;
+  filter: blur(6px);          /* Apply blur effect */
+  pointer-events: none;       /* Disable clicking on background */
+  user-select: none;          /* Prevent text selection */
 }
 
 /* === Images === */
+/* Make images responsive and block-level */
 img {
   max-width: 100%;
   display: block;
 }
 
-/* === Header === */
+/* === Header Section === */
 .site-header {
-  text-align: center;
-  margin-bottom: 1rem;
+  text-align: center;        /* Center text and image */
+  margin-bottom: 1rem;       /* Space below header */
 }
 
+/* Banner image styling */
 .header-image {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-top: 0.5rem;
+  width: 100%;               /* Full container width */
+  max-height: 200px;         /* Limit max height */
+  object-fit: cover;         /* Crop nicely */
+  border-radius: 8px;        /* Rounded corners */
+  margin-top: 0.5rem;        /* Small spacing above image */
 }
 
-/* === Service Cards === */
+/* === Service Cards Container === */
 .services-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Responsive columns */
+  gap: 1rem;                 /* Space between cards */
   margin-bottom: 2rem;
 }
 
+/* === Individual Service Cards === */
 .service-card {
-  background: #f4f4f4;
+  background: #f4f4f4;       /* Light gray background */
   padding: 1.2rem;
   border-radius: 10px;
   text-align: center;
   font-size: 1.1rem;
   font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, background 0.2s ease;
+  cursor: pointer;           /* Pointer cursor on hover */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: transform 0.2s ease, background 0.2s ease; /* Smooth hover effect */
 }
 
+/* Hover effect: lift card and lighten background */
 .service-card:hover {
   transform: translateY(-2px);
   background: #eaf6ff;
 }
 
-/* === Modal === */
+/* === Modal Container === */
+/* Modal fills screen and centers content */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 999;
+  z-index: 999;             /* On top of everything */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* Hide modal by default when it has .hidden */
 .modal.hidden {
   display: none;
 }
 
 /* === Modal Backdrop === */
+/* Dark semi-transparent overlay with blur */
 .modal-backdrop {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 1;
+  background: rgba(0, 0, 0, 0.5);  /* Black with opacity */
+  backdrop-filter: blur(4px);       /* Blur behind overlay */
+  z-index: 1;                       /* Behind modal content */
 }
 
-/* === Modal Content === */
+/* === Modal Content Box === */
 .modal-content {
   position: relative;
   background: white;
   padding: 2rem 1.5rem;
   border-radius: 10px;
-  z-index: 2;
-  width: 90%;
-  max-width: 400px;
-  animation: slideUp 0.3s ease;
+  z-index: 2;                      /* Above backdrop */
+  width: 90%;                     /* Responsive width */
+  max-width: 400px;               /* Max width */
+  animation: slideUp 0.3s ease;  /* Slide in animation */
 }
 
+/* Slide up animation class */
 .slide-up {
   animation: slideUp 0.3s ease-out;
 }
 
+/* Keyframes for slideUp animation */
 @keyframes slideUp {
   from {
     transform: translateY(40px);
@@ -124,7 +137,8 @@ img {
   }
 }
 
-/* === Close Button === */
+/* === Modal Close Button === */
+/* Positioned top-right inside modal content */
 .close-btn {
   position: absolute;
   top: 0.7rem;
@@ -136,18 +150,20 @@ img {
   color: #555;
 }
 
-/* === Auth Form === */
+/* === Auth Form Styling === */
 #authForm {
   margin-top: 1rem;
   display: flex;
   flex-direction: column;
 }
 
+/* Form labels */
 #authForm label {
   font-size: 0.9rem;
   margin-bottom: 0.4rem;
 }
 
+/* Input fields */
 #authForm input {
   padding: 0.6rem;
   font-size: 1rem;
@@ -156,9 +172,10 @@ img {
   border: 1px solid #ccc;
 }
 
+/* Submit button styling */
 #authForm button[type="submit"] {
   padding: 0.7rem;
-  background-color: #007bff;
+  background-color: #007bff;    /* Blue */
   color: white;
   border: none;
   border-radius: 6px;
@@ -167,16 +184,18 @@ img {
   transition: background-color 0.2s ease;
 }
 
+/* Submit button hover effect */
 #authForm button[type="submit"]:hover {
-  background-color: #0056b3;
+  background-color: #0056b3;    /* Darker blue */
 }
 
-/* === Auth Switch (Login/Register toggle) === */
+/* === Login/Register Switch Section === */
 .auth-switch {
   margin-top: 1.5rem;
   text-align: center;
 }
 
+/* Toggle button for switching login/register */
 .auth-switch button {
   background: none;
   border: none;
@@ -187,9 +206,58 @@ img {
   text-decoration: underline;
 }
 
-/* === Small Note Text === */
+/* === Small Note Text under form === */
 .note {
   font-size: 0.85rem;
   color: #555;
   margin-top: 0.3rem;
+}
+
+/* === Toast Notification Container === */
+/* Fixed bottom-right corner stacking vertical toasts */
+.toast-container {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 9999;               /* Above almost everything */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* === Toast Message Styling === */
+.toast {
+  padding: 0.8rem 1.2rem;
+  border-radius: 6px;
+  color: white;
+  background-color: #333;
+  font-size: 0.95rem;
+  min-width: 200px;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: fadeIn 0.2s ease-out;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Toast variants with different background colors */
+.toast-info { background-color: #007bff; }    /* Blue info */
+.toast-success { background-color: #28a745; } /* Green success */
+.toast-error { background-color: #dc3545; }   /* Red error */
+
+/* Hide toast with fade and slide down */
+.toast.hide {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Toast fade-in animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
