@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoX Services</title>
+  <link rel="stylesheet" href="/shared/global.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>AutoX Services</h1>
+  </header>
+
+  <main class="services-container">
+    <div class="service-card" data-service="Recovery">🚗 Recovery</div>
+    <div class="service-card" data-service="Battery">🔋 Battery Fitting</div>
+    <div class="service-card" data-service="Service">🛠️ Full Service</div>
+    <div class="service-card" data-service="Brakes">🛑 Brake Check</div>
+    <div class="service-card" data-service="AC">❄️ AC Diagnostics</div>
+  </main>
+
+  <!-- Login/Register Modal -->
+  <div id="authModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Login or Register</h2>
+      <form id="authForm">
+        <label>Email or Phone:</label>
+        <input type="text" name="contact" required placeholder="Email or Phone" />
+        <button type="submit">Continue</button>
+        <p class="note">We'll send a verification code.</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const cards = document.querySelectorAll('.service-card');
+    const authModal = document.getElementById('authModal');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const loggedIn = false; // Replace with real auth check
+        if (!loggedIn) {
+          authModal.classList.remove('hidden');
+        } else {
+          const service = card.dataset.service;
+          window.location.href = `/book?service=${service}`;
+        }
+      });
+    });
+
+    document.getElementById('authForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Trigger phone/email verification logic here
+      alert('Verification link/code sent.');
+    });
+  </script>
+</body>
+</html>
