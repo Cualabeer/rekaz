@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="shared/global.css" />
 </head>
 <body>
-  <!-- Blur wrapper -->
+  <!-- Page content (blurred when modal is open) -->
   <div id="pageContent">
     <header class="site-header">
       <h1>AutoX Services</h1>
@@ -23,7 +23,7 @@
     </main>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal for Login/Register -->
   <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="modal-backdrop"></div>
 
@@ -53,7 +53,6 @@
     </div>
   </div>
 
-  <!-- Script -->
   <script>
     const cards = document.querySelectorAll('.service-card');
     const authModal = document.getElementById('authModal');
@@ -63,11 +62,12 @@
     const authSwitchText = document.getElementById('authSwitchText');
     const authSwitchBtn = document.getElementById('authSwitchBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalBackdrop = document.querySelector('.modal-backdrop');
 
     let selectedService = null;
     let isRegistering = false;
 
-    // Open modal on service click
+    // Open modal on service card click
     cards.forEach(card => {
       card.addEventListener('click', () => {
         selectedService = card.dataset.service;
@@ -76,7 +76,7 @@
       });
     });
 
-    // Switch between Login/Register
+    // Toggle login/register mode
     authSwitchBtn.addEventListener('click', () => {
       isRegistering = !isRegistering;
       authTitle.textContent = isRegistering ? 'Register' : 'Login';
@@ -87,7 +87,7 @@
       authSwitchBtn.textContent = isRegistering ? 'Login' : 'Register';
     });
 
-    // Send email code
+    // Submit form and send email code
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
@@ -105,7 +105,7 @@
         });
 
         if (response.ok) {
-          alert(`Verification code sent to ${email}. Please check your email.`);
+          alert(`Verification code sent to ${email}. Please check your inbox.`);
           authModal.classList.add('hidden');
           document.body.classList.remove('modal-open');
         } else {
@@ -117,8 +117,14 @@
       }
     });
 
-    // Close modal
+    // Close modal on button click
     closeModalBtn.addEventListener('click', () => {
+      authModal.classList.add('hidden');
+      document.body.classList.remove('modal-open');
+    });
+
+    // Close modal on backdrop click
+    modalBackdrop.addEventListener('click', () => {
       authModal.classList.add('hidden');
       document.body.classList.remove('modal-open');
     });
