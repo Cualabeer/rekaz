@@ -1,131 +1,156 @@
-/* === Base Reset and Setup === */
-/* Remove default margin/padding and set box-sizing for all elements */
+/* === RESET === */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Base body styling: font, background, color, line height */
-body {
+html, body {
   font-family: system-ui, sans-serif;
-  background-color: #fff;
+  background-color: #F7F9FC;
   color: #222;
   line-height: 1.6;
   padding: 1rem;
+  transition: background 0.3s, color 0.3s;
 }
 
-/* === Modal Open State === */
-/* When modal is open, disable scrolling on body */
-body.modal-open {
-  overflow: hidden;
-  height: 100vh;
-}
-
-/* When modal is open, blur and disable interaction on main page content */
 body.modal-open #pageContent {
-  filter: blur(6px);          /* Apply blur effect */
-  pointer-events: none;       /* Disable clicking on background */
-  user-select: none;          /* Prevent text selection */
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
 }
 
-/* === Images === */
-/* Make images responsive and block-level */
 img {
   max-width: 100%;
   display: block;
+  height: auto;
 }
 
-/* === Header Section === */
+/* === HEADER === */
 .site-header {
-  text-align: center;        /* Center text and image */
-  margin-bottom: 1rem;       /* Space below header */
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
-/* Banner image styling */
 .header-image {
-  width: 100%;               /* Full container width */
-  max-height: 200px;         /* Limit max height */
-  object-fit: cover;         /* Crop nicely */
-  border-radius: 8px;        /* Rounded corners */
-  margin-top: 0.5rem;        /* Small spacing above image */
+  border-radius: 10px;
+  max-height: 200px;
+  object-fit: cover;
+  margin-top: 0.5rem;
 }
 
-/* === Service Cards Container === */
+/* === SERVICE CARDS === */
 .services-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Responsive columns */
-  gap: 1rem;                 /* Space between cards */
-  margin-bottom: 2rem;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
 
-/* === Individual Service Cards === */
 .service-card {
-  background: #f4f4f4;       /* Light gray background */
+  background-color: #EAF2FB;
   padding: 1.2rem;
-  border-radius: 10px;
   text-align: center;
-  font-size: 1.1rem;
+  border-radius: 10px;
   font-weight: bold;
-  cursor: pointer;           /* Pointer cursor on hover */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  transition: transform 0.2s ease, background 0.2s ease; /* Smooth hover effect */
+  font-size: 1.1rem;
+  cursor: pointer;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transform: translateY(40px);
+  opacity: 0;
+  transition: transform 0.6s ease, opacity 0.6s ease, background 0.3s;
 }
 
-/* Hover effect: lift card and lighten background */
 .service-card:hover {
-  transform: translateY(-2px);
-  background: #eaf6ff;
+  background: #d9e8fa;
+  border-color: #0057B7;
 }
 
-/* === Modal Container === */
-/* Modal fills screen and centers content */
+.service-card.animate-in {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* === DARK MODE === */
+body.dark-mode {
+  background-color: #1c1c1c;
+  color: #f0f0f0;
+}
+
+body.dark-mode .service-card {
+  background: #2e2e2e;
+  color: #fff;
+  border-color: #333;
+}
+
+body.dark-mode .modal-content {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+body.dark-mode input,
+body.dark-mode button {
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+body.dark-mode .toast-info { background: #0063cc; }
+body.dark-mode .toast-success { background: #2ecc71; }
+body.dark-mode .toast-error { background: #e74c3c; }
+
+/* === TOGGLE BUTTON === */
+.dark-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background-color: #FF6A00;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  z-index: 10001;
+}
+
+/* === MODAL === */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 999;             /* On top of everything */
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 999;
 }
 
-/* Hide modal by default when it has .hidden */
 .modal.hidden {
   display: none;
 }
 
-/* === Modal Backdrop === */
-/* Dark semi-transparent overlay with blur */
 .modal-backdrop {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);  /* Black with opacity */
-  backdrop-filter: blur(4px);       /* Blur behind overlay */
-  z-index: 1;                       /* Behind modal content */
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
 }
 
-/* === Modal Content Box === */
 .modal-content {
-  position: relative;
-  background: white;
+  background: #fff;
   padding: 2rem 1.5rem;
   border-radius: 10px;
-  z-index: 2;                      /* Above backdrop */
-  width: 90%;                     /* Responsive width */
-  max-width: 400px;               /* Max width */
-  animation: slideUp 0.3s ease;  /* Slide in animation */
+  position: relative;
+  z-index: 2;
+  max-width: 400px;
+  width: 90%;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Slide up animation class */
 .slide-up {
-  animation: slideUp 0.3s ease-out;
+  animation: slideUp 0.3s ease;
 }
 
-/* Keyframes for slideUp animation */
 @keyframes slideUp {
   from {
     transform: translateY(40px);
@@ -137,120 +162,112 @@ img {
   }
 }
 
-/* === Modal Close Button === */
-/* Positioned top-right inside modal content */
 .close-btn {
   position: absolute;
   top: 0.7rem;
   right: 1rem;
-  background: transparent;
-  border: none;
   font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: #888;
   cursor: pointer;
-  color: #555;
 }
 
-/* === Auth Form Styling === */
-#authForm {
-  margin-top: 1rem;
+/* === FORM STYLES === */
+form {
   display: flex;
   flex-direction: column;
 }
 
-/* Form labels */
-#authForm label {
-  font-size: 0.9rem;
-  margin-bottom: 0.4rem;
+label {
+  margin-bottom: 0.3rem;
+  font-weight: 500;
 }
 
-/* Input fields */
-#authForm input {
+input[type="email"],
+input[type="text"] {
   padding: 0.6rem;
   font-size: 1rem;
   margin-bottom: 1rem;
   border-radius: 6px;
   border: 1px solid #ccc;
+  background: #fefefe;
 }
 
-/* Submit button styling */
-#authForm button[type="submit"] {
-  padding: 0.7rem;
-  background-color: #007bff;    /* Blue */
+.email-feedback {
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+button[type="submit"] {
+  background-color: #0057B7;
   color: white;
+  padding: 0.7rem;
+  font-size: 1rem;
   border: none;
   border-radius: 6px;
-  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.2s ease;
 }
 
-/* Submit button hover effect */
-#authForm button[type="submit"]:hover {
-  background-color: #0056b3;    /* Darker blue */
+button[type="submit"]:hover {
+  background-color: #0046a3;
 }
 
-/* === Login/Register Switch Section === */
 .auth-switch {
   margin-top: 1.5rem;
   text-align: center;
 }
 
-/* Toggle button for switching login/register */
 .auth-switch button {
   background: none;
   border: none;
-  color: #007bff;
+  color: #FF6A00;
   cursor: pointer;
-  font-size: 1rem;
-  margin-top: 0.4rem;
   text-decoration: underline;
+  font-size: 1rem;
 }
 
-/* === Small Note Text under form === */
-.note {
-  font-size: 0.85rem;
-  color: #555;
-  margin-top: 0.3rem;
-}
-
-/* === Toast Notification Container === */
-/* Fixed bottom-right corner stacking vertical toasts */
+/* === TOAST NOTIFICATIONS === */
 .toast-container {
   position: fixed;
   bottom: 1rem;
   right: 1rem;
-  z-index: 9999;               /* Above almost everything */
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  z-index: 10000;
 }
 
-/* === Toast Message Styling === */
 .toast {
   padding: 0.8rem 1.2rem;
   border-radius: 6px;
-  color: white;
-  background-color: #333;
   font-size: 0.95rem;
+  color: white;
   min-width: 200px;
   max-width: 300px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  animation: fadeIn 0.2s ease-out;
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.3s ease-out;
+  transition: all 0.4s ease;
 }
 
-/* Toast variants with different background colors */
-.toast-info { background-color: #007bff; }    /* Blue info */
-.toast-success { background-color: #28a745; } /* Green success */
-.toast-error { background-color: #dc3545; }   /* Red error */
+.toast-info {
+  background-color: #0057B7;
+}
 
-/* Hide toast with fade and slide down */
+.toast-success {
+  background-color: #28a745;
+}
+
+.toast-error {
+  background-color: #dc3545;
+}
+
 .toast.hide {
   opacity: 0;
   transform: translateY(20px);
 }
 
-/* Toast fade-in animation keyframes */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -259,5 +276,30 @@ img {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* === SPINNER === */
+.spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 6px solid #ccc;
+  border-top-color: #0057B7;
+  animation: spin 1s linear infinite;
+  z-index: 10000;
+}
+
+.spinner.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
