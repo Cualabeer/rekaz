@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AutoX Services</title>
   <link rel="stylesheet" href="shared/global.css" />
 </head>
 <body>
   <header class="site-header">
-    <h1>AutoX Services</h1>
+    AutoX Services
   </header>
 
   <main class="services-container">
@@ -19,39 +19,92 @@
     <div class="service-card" data-service="AC">❄️ AC Diagnostics</div>
   </main>
 
-  <!-- Login/Register Modal -->
-  <div id="authModal" class="modal hidden">
+  <!-- Email Login/Register Modal -->
+  <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="modal-content">
-      <h2>Login or Register</h2>
+      <h2 id="authTitle">Login</h2>
+
       <form id="authForm">
-        <label>Email or Phone:</label>
-        <input type="text" name="contact" required placeholder="Email or Phone" />
-        <button type="submit">Continue</button>
-        <p class="note">We'll send a verification code.</p>
+        <label for="email">Email address:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+        <button type="submit" id="authSubmit">Send Code</button>
+        <p class="note">We'll email you a 6-digit code.</p>
       </form>
+
+      <div class="auth-switch">
+        <p id="authSwitchText">Don't have an account?</p>
+        <button id="authSwitchBtn" type="button">Register</button>
+      </div>
     </div>
   </div>
 
   <script>
     const cards = document.querySelectorAll('.service-card');
     const authModal = document.getElementById('authModal');
+    const authForm = document.getElementById('authForm');
+    const authTitle = document.getElementById('authTitle');
+    const authSubmit = document.getElementById('authSubmit');
+    const authSwitchText = document.getElementById('authSwitchText');
+    const authSwitchBtn = document.getElementById('authSwitchBtn');
 
+    let selectedService = null;
+    let isRegistering = false;
+
+    // Open modal when a service card is clicked
     cards.forEach(card => {
       card.addEventListener('click', () => {
-        const loggedIn = false; // Replace with real auth check
-        if (!loggedIn) {
-          authModal.classList.remove('hidden');
-        } else {
-          const service = card.dataset.service;
-          window.location.href = `/book?service=${service}`;
-        }
+        selectedService = card.dataset.service;
+        authModal.classList.remove('hidden');
       });
     });
 
-    document.getElementById('authForm').addEventListener('submit', (e) => {
+    // Toggle between Login and Register modes
+    authSwitchBtn.addEventListener('click', () => {
+      isRegistering = !isRegistering;
+      authTitle.textContent = isRegistering ? 'Register' : 'Login';
+      authSubmit.textContent = isRegistering ? 'Register & Send Code' : 'Send Code';
+      authSwitchText.textContent = isRegistering
+        ? 'Already have an account?'
+        : "Don't have an account?";
+      authSwitchBtn.textContent = isRegistering ? 'Login' : 'Register';
+    });
+
+    // Handle form submission to send verification code
+    authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      // Trigger phone/email verification logic here
-      alert('Verification link/code sent.');
+      const email = document.getElementById('email').value.trim();
+
+      if (!email) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+
+      try {
+        const response = await fetch('https://your-backend-domain.com/api/send-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, register: isRegistering })
+        });
+
+        if (response.ok) {
+          alert(`Verification code sent to ${email}. Please check your email.`);
+          // Here you can show a code input modal or redirect to a verification page
+          // For now, just close the modal
+          authModal.classList.add('hidden');
+        } else {
+          const errorData = await response.json();
+          alert(errorData.error || 'Failed to send verification code. Please try again.');
+        }
+      } catch (error) {
+        alert('Network error. Please try again later.');
+      }
     });
   </script>
 </body>
