@@ -1,84 +1,112 @@
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import nodemailer from 'nodemailer';
-
-const verificationCodes = new Map();
+require('dotenv').config();
+const express = require('express');
+const nodemailer = require('nodemailer');
+const rateLimit = require('express-rate-limit');
+const Redis = require('ioredis');
+const session = require('express-session');
+const RedisStore = require('connect-redis').default;
 
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
 
-const PORT = process.env.PORT || 3000;
+// Validate required env vars on startup (fail fast)
+const {
+  PORT = 3000,
+  REDIS_URL,
+  SESSION_SECRET,
+  SMTP_HOST,
+  SMTP_PORT,
+  SMTP_USER,
+  SMTP_PASS,
+  SMTP_FROM
+} = process.env;
 
-// Configure your SMTP transporter (replace with your credentials)
+if (!REDIS_URL || !SESSION_SECRET || !SMTP_HOST || !SMTP_USER || !SMTP_PASS || !SMTP_FROM) {
+  console.error('Missing required environment variables. Please check .env');
+  process.exit(1);
+}
+
+// Setup Redis client & session store
+const redisClient = new Redis(REDIS_URL);
+const redisStore = new RedisStore({ client: redisClient });
+
+app.use(express.json());
+
+// Rate limiter: max 50 requests per 15 minutes per IP
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  message: 'Too many requests, please try again later.'
+}));
+
+// Session middleware using Redis store
+app.use(session({
+  store: redisStore,
+  secret: SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 15 * 60 * 1000 } // 15 min session
+}));
+
+// Nodemailer transporter setup
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: SMTP_HOST,
+  port: Number(SMTP_PORT) || 587,
+  secure: false,
   auth: {
-    user: 'your.email@gmail.com',
-    pass: 'your_app_password_or_oauth'
+    user: SMTP_USER,
+    pass: SMTP_PASS
   }
 });
 
-// Generate a random 6-digit code as string
+// Generate 6-digit numeric code
 function generateCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Endpoint to send verification code
+// Endpoint: send verification code email
 app.post('/api/send-code', async (req, res) => {
-  const { email, register } = req.body;
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required' });
 
-  if (!email || typeof email !== 'string') {
-    return res.status(400).json({ error: 'Valid email is required.' });
-  }
+  const code = generateCode();
 
   try {
-    const code = generateCode();
-    verificationCodes.set(email, code);
-
-    const mailOptions = {
-      from: '"AutoX Services" <your.email@gmail.com>',
+    await transporter.sendMail({
+      from: SMTP_FROM,
       to: email,
-      subject: register
-        ? 'AutoX Registration Verification Code'
-        : 'AutoX Login Verification Code',
-      text: `Your AutoX verification code is: ${code}\n\nThis code will expire in 10 minutes.`
-    };
+      subject: 'Your AutoX Verification Code',
+      text: `Your verification code is: ${code}`
+    });
 
-    await transporter.sendMail(mailOptions);
+    // Save code in Redis with 10min expiration
+    await redisClient.set(`verify:${email}`, code, 'EX', 600);
 
-    console.log(`Verification code sent to ${email}: ${code}`);
-
-    res.json({ message: 'Verification code sent successfully.' });
-  } catch (error) {
-    console.error('Error sending email:', error);
-    res.status(500).json({ error: 'Failed to send verification code.' });
+    res.json({ message: 'Verification code sent' });
+  } catch (err) {
+    console.error('Error sending email:', err);
+    res.status(500).json({ error: 'Failed to send verification code' });
   }
 });
 
-// Endpoint to verify the 6-digit code submitted by user
-app.post('/api/verify-code', (req, res) => {
+// Endpoint: verify submitted code
+app.post('/api/verify-code', async (req, res) => {
   const { email, code } = req.body;
+  if (!email || !code) return res.status(400).json({ error: 'Email and code required' });
 
-  if (!email || !code) {
-    return res.status(400).json({ error: 'Email and code are required.' });
-  }
-
-  const storedCode = verificationCodes.get(email);
-
-  if (!storedCode) {
-    return res.status(400).json({ error: 'No verification code found. Please request a new one.' });
-  }
-
-  if (storedCode === code) {
-    verificationCodes.delete(email);
-    return res.json({ message: 'Verification successful.' });
-  } else {
-    return res.status(400).json({ error: 'Incorrect verification code.' });
+  try {
+    const storedCode = await redisClient.get(`verify:${email}`);
+    if (storedCode && storedCode === code) {
+      await redisClient.del(`verify:${email}`); // remove code after successful verify
+      res.json({ message: 'Verification successful' });
+    } else {
+      res.status(400).json({ error: 'Invalid verification code' });
+    }
+  } catch (err) {
+    console.error('Verification error:', err);
+    res.status(500).json({ error: 'Verification failed' });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`AutoX backend listening on port ${PORT}`);
 });
