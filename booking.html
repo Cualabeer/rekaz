@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book Now — AutoX</title>
+  <link rel="stylesheet" href="shared/global.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Confirm Your Booking</h1>
+  </header>
+
+  <main class="container">
+    <section class="cart-summary">
+      <h2>Selected Service:</h2>
+      <div id="selectedService"></div>
+    </section>
+
+    <form id="bookingForm">
+      <label>Select Date</label>
+      <input type="date" required />
+      <label>Select Time</label>
+      <input type="time" required />
+      <label>Your Address</label>
+      <input type="text" placeholder="Use GPS or enter manually" required />
+      <button type="submit">Book Now</button>
+    </form>
+  </main>
+
+  <script src="shared/js/cart.js" defer></script>
+</body>
+</html>
