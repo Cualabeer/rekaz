@@ -1,132 +1,132 @@
-/* Reset */
+/* Reset & base */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 body {
-  margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #fff;
-  color: #333;
+  background: #0057b7; /* Brand blue */
+  color: #fff;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+.container {
+  max-width: 960px;
+  margin: auto;
+  padding: 1rem;
 }
 
 /* Header */
 .site-header {
-  background-color: #1e90ff; /* Dodger Blue */
-  color: white;
-  padding: 1rem;
   text-align: center;
-  position: relative;
+  padding: 1rem 0;
+  background: #ffa500; /* Brand orange */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  border-radius: 8px;
+}
+.site-header h1 {
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 .header-image {
   max-width: 100%;
   height: auto;
-  margin-top: 0.5rem;
-  border-radius: 6px;
-}
-
-/* Service cards container */
-.services-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1rem;
-  max-width: 960px;
-  margin: 1rem auto;
-}
-
-/* Each service card */
-.service-card {
-  flex: 1 1 150px;
-  max-width: 180px;
-  background: #ff4500; /* OrangeRed */
-  color: white;
-  font-weight: 700;
-  font-size: 1.1rem;
-  padding: 1.2rem;
   border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+/* Services Container */
+.services-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.service-card {
+  background: #003a75;
+  padding: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-radius: 10px;
   text-align: center;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.3s ease;
-  box-shadow: 0 3px 10px rgba(255, 69, 0, 0.5);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  border: none;
+  color: #fff;
 }
 .service-card:hover,
 .service-card:focus {
-  background-color: #d43600;
+  background: #0072ff;
   outline: none;
+  transform: translateY(-4px);
 }
 
 /* Modal */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10000;
+  padding: 1rem;
+  z-index: 1000;
 }
-
-.modal.hidden {
+.modal[hidden] {
   display: none;
 }
-
 .modal-content {
-  background: #fff;
-  padding: 2rem 2.5rem;
-  border-radius: 12px;
-  max-width: 420px;
-  width: 90%;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  background: #ffa500;
+  border-radius: 10px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  color: #003a75;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   position: relative;
 }
-
-/* Close button */
 .close-btn {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 10px;
+  right: 15px;
   background: transparent;
   border: none;
-  font-size: 1.6rem;
-  color: #ff4500;
+  font-size: 2rem;
   cursor: pointer;
-  transition: color 0.2s ease;
+  color: #003a75;
 }
-.close-btn:hover,
 .close-btn:focus {
-  color: #d43600;
-  outline: none;
+  outline: 2px solid #003a75;
 }
 
-/* Inputs */
-input[type="email"],
-input[type="text"] {
-  width: 100%;
-  padding: 0.6rem 0.8rem;
-  font-size: 1rem;
-  border: 2px solid #1e90ff;
-  border-radius: 6px;
-  margin-top: 0.4rem;
-  margin-bottom: 1.2rem;
-  transition: border-color 0.3s ease;
-}
-input[type="email"]:focus,
-input[type="text"]:focus {
-  border-color: #ff4500;
-  outline: none;
-  box-shadow: 0 0 6px rgba(255, 69, 0, 0.5);
-}
-
-/* Buttons */
-button[type="submit"] {
-  background-color: #ff4500;
-  color: white;
+/* Form */
+label {
+  display: block;
   font-weight: 700;
-  font-size: 1.1rem;
-  padding: 0.6rem 1.2rem;
+  margin-bottom: 0.25rem;
+}
+input[type="email"] {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #003a75;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+input[type="email"]:focus {
+  border-color: #0072ff;
+  outline: none;
+  box-shadow: 0 0 5px #0072ff;
+}
+button[type="submit"] {
+  background: #003a75;
+  color: white;
   border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   border-radius: 6px;
   cursor: pointer;
   width: 100%;
@@ -134,25 +134,67 @@ button[type="submit"] {
 }
 button[type="submit"]:hover,
 button[type="submit"]:focus {
-  background-color: #d43600;
+  background: #001f40;
   outline: none;
 }
 
-/* Visually hidden for accessibility */
-.visually-hidden {
-  position: absolute !important;
-  height: 1px; width: 1px;
-  overflow: hidden;
-  clip: rect(1px, 1px, 1px, 1px);
-  white-space: nowrap;
+/* Auth switch */
+.auth-switch {
+  margin-top: 1rem;
+  text-align: center;
+  color: #003a75;
+}
+.auth-switch p {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+.auth-switch button {
+  background: transparent;
+  border: none;
+  color: #003a75;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.auth-switch button:hover,
+.auth-switch button:focus {
+  color: #001f40;
+  outline: none;
 }
 
-/* Responsive tweaks */
+/* Note under submit */
+.note {
+  font-size: 0.875rem;
+  color: #003a75;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #003a75;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+  font-weight: 700;
+  font-size: 1rem;
+  z-index: 1100;
+  opacity: 0.95;
+  user-select: none;
+}
+
+/* Responsive */
 @media (max-width: 480px) {
-  .service-card {
-    max-width: 100%;
+  .services-container {
+    grid-template-columns: 1fr;
   }
   .modal-content {
-    padding: 1.5rem 1.8rem;
+    max-width: 100%;
+    padding: 1.5rem 1rem;
   }
 }
