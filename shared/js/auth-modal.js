@@ -1,91 +1,61 @@
-(() => {
-  const serviceButtons = document.querySelectorAll('.service-card');
-  const authModal = document.getElementById('authModal');
-  const authForm = document.getElementById('authForm');
-  const authTitle = document.getElementById('authTitle');
-  const authSubmitBtn = document.getElementById('authSubmitBtn');
-  const authSwitchText = document.getElementById('authSwitchText');
-  const authSwitchBtn = document.getElementById('authSwitchBtn');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const toast = document.getElementById('toast');
-  const emailInput = document.getElementById('emailInput');
+// shared/js/auth-modal.js
 
-  let selectedService = null;
-  let isRegistering = false;
+const authModal = document.getElementById('authModal');
+const authForm = document.getElementById('authForm');
+const authSwitchBtn = document.getElementById('authSwitchBtn');
+const authSubmit = document.getElementById('authSubmit');
+const authTitle = document.getElementById('authTitle');
+const authSwitchText = document.getElementById('authSwitchText');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const emailInput = document.getElementById('emailInput');
+let isRegistering = false;
 
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.hidden = false;
-    setTimeout(() => {
-      toast.hidden = true;
-      toast.textContent = '';
-    }, 4000);
+// Open modal when service is selected
+document.querySelectorAll('.service-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const service = card.dataset.service;
+    sessionStorage.setItem('selectedService', service);
+    authModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  });
+});
+
+// Close modal
+closeModalBtn.addEventListener('click', () => {
+  authModal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+});
+
+// Toggle between login/register
+authSwitchBtn.addEventListener('click', () => {
+  isRegistering = !isRegistering;
+  authTitle.textContent = isRegistering ? 'Register' : 'Login';
+  authSubmit.textContent = isRegistering ? 'Register & Send Code' : 'Send Code';
+  authSwitchText.textContent = isRegistering
+    ? 'Already have an account?'
+    : "Don't have an account?";
+  authSwitchBtn.textContent = isRegistering ? 'Login' : 'Register';
+});
+
+// Submit form
+authForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = emailInput.value.trim();
+  if (!email) return showToast('Enter a valid email');
+
+  const response = await fetch('/api/send-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, register: isRegistering }),
+  });
+
+  if (response.ok) {
+    sessionStorage.setItem('userEmail', email);
+    showToast(`Code sent to ${email}`);
+    authModal.classList.add('hidden');
+    setTimeout(() => window.location.href = 'profile.html', 1200);
+  } else {
+    const { error } = await response.json();
+    showToast(error || 'Something went wrong');
   }
-
-  function openModal() {
-    authModal.hidden = false;
-    document.body.style.overflow = 'hidden';
-    authTitle.textContent = isRegistering ? 'Register' : 'Login';
-    authSubmitBtn.textContent = isRegistering ? 'Register & Send Code' : 'Send Code';
-    authSwitchText.textContent = isRegistering
-      ? 'Already have an account?'
-      : "Don't have an account?";
-    authSwitchBtn.textContent = isRegistering ? 'Login' : 'Register';
-    emailInput.value = '';
-    emailInput.focus();
-  }
-
-  function closeModal() {
-    authModal.hidden = true;
-    document.body.style.overflow = '';
-    authForm.reset();
-  }
-
-  serviceButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      selectedService = button.dataset.service;
-      openModal();
-    });
-  });
-
-  closeModalBtn.addEventListener('click', closeModal);
-
-  authSwitchBtn.addEventListener('click', () => {
-    isRegistering = !isRegistering;
-    openModal();
-  });
-
-  authForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const email = emailInput.value.trim();
-    if (!email) {
-      showToast('Please enter a valid email address.');
-      return;
-    }
-    try {
-      const response = await fetch('https://your-backend-domain.com/api/send-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, service: selectedService, register: isRegistering }),
-      });
-      if (response.ok) {
-        showToast(`Verification code sent to ${email}. Check your email.`);
-        closeModal();
-        sessionStorage.setItem('userEmail', email);
-        sessionStorage.setItem('selectedService', selectedService);
-        window.location.href = 'booking.html';
-      } else {
-        const data = await response.json();
-        showToast(data.error || 'Failed to send verification code.');
-      }
-    } catch {
-      showToast('Network error. Please try again later.');
-    }
-  });
-
-  window.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !authModal.hidden) {
-      closeModal();
-    }
-  });
-})();
+});
