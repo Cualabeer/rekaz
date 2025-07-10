@@ -3,68 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AutoX Services — Quick Login & Service Booking</title>
+  <title>AutoX — Mobile Services</title>
   <link rel="stylesheet" href="shared/global.css" />
-  <meta name="description" content="AutoX - Book vehicle recovery, battery fitting, servicing, brake checks, and AC diagnostics easily. Secure login via email verification code." />
-  <link rel="icon" href="shared/favicon.ico" />
 </head>
 <body>
-  <header class="site-header container" role="banner">
+  <header class="site-header">
     <h1>AutoX Services</h1>
-    <img src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg" alt="AutoX banner image" class="header-image" />
+    <img src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg" alt="AutoX Banner" class="header-image" />
   </header>
 
-  <main class="container" role="main">
-    <section class="services-container" aria-label="Select a service">
-      <button class="service-card" data-service="Recovery" type="button" aria-pressed="false">🚗 Recovery</button>
-      <button class="service-card" data-service="Battery" type="button" aria-pressed="false">🔋 Battery Fitting</button>
-      <button class="service-card" data-service="Service" type="button" aria-pressed="false">🛠️ Full Service</button>
-      <button class="service-card" data-service="Brakes" type="button" aria-pressed="false">🛑 Brake Check</button>
-      <button class="service-card" data-service="AC" type="button" aria-pressed="false">❄️ AC Diagnostics</button>
-    </section>
+  <main class="services-container">
+    <button class="service-card" data-service="Recovery">🚗 Recovery</button>
+    <button class="service-card" data-service="Battery">🔋 Battery</button>
+    <button class="service-card" data-service="Service">🛠️ Service</button>
+    <button class="service-card" data-service="Brakes">🛑 Brakes</button>
+    <button class="service-card" data-service="AC">❄️ AC</button>
   </main>
 
-  <!-- Login/Register Modal -->
-  <aside id="authModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle" tabindex="-1" hidden>
-    <div class="modal-content" role="document">
-      <button class="close-btn" id="closeModalBtn" aria-label="Close login modal">&times;</button>
+  <div id="authModal" class="modal hidden" aria-modal="true" role="dialog">
+    <div class="modal-content">
+      <button id="closeModalBtn" class="close-btn">&times;</button>
       <h2 id="authTitle">Login</h2>
-      <form id="authForm" novalidate>
-        <label for="emailInput">Email address</label>
-        <input
-          type="email"
-          id="emailInput"
-          name="email"
-          placeholder="you@example.com"
-          autocomplete="email"
-          required
-          aria-required="true"
-        />
-        <button type="submit" id="authSubmitBtn">Send Code</button>
-        <p class="note">We'll email you a 6-digit code to verify your account.</p>
+      <form id="authForm">
+        <label>Email</label>
+        <input type="email" id="emailInput" required />
+        <button type="submit" id="authSubmit">Send Code</button>
       </form>
       <div class="auth-switch">
         <p id="authSwitchText">Don't have an account?</p>
-        <button id="authSwitchBtn" type="button">Register</button>
+        <button id="authSwitchBtn">Register</button>
       </div>
     </div>
-  </aside>
+  </div>
 
-  <!-- Toast notification container -->
-  <div id="toast" role="alert" aria-live="assertive" aria-atomic="true" class="toast" hidden></div>
+  <div id="toast" class="toast hidden"></div>
 
-  <!-- Lazy-load auth-modal.js on demand -->
-  <script>
-    const serviceButtons = document.querySelectorAll('.service-card');
-    let authScriptLoaded = false;
-    function loadAuthScript() {
-      if (authScriptLoaded) return;
-      authScriptLoaded = true;
-      const script = document.createElement('script');
-      script.src = 'shared/js/auth-modal.js';
-      document.body.appendChild(script);
-    }
-    serviceButtons.forEach(btn => btn.addEventListener('click', loadAuthScript, { once: true }));
-  </script>
+  <script src="shared/js/auth-modal.js" defer></script>
+  <script src="shared/js/toast.js" defer></script>
 </body>
 </html>
