@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Profile — AutoX</title>
+  <link rel="stylesheet" href="shared/global.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Welcome Back</h1>
+  </header>
+
+  <main class="container">
+    <div class="boarding-pass">
+      <div class="bp-header">
+        <span>🔧 Full Service</span>
+        <span>#AX4582</span>
+      </div>
+      <div class="bp-details">
+        <div><strong>Date:</strong> 18 July 2025</div>
+        <div><strong>Time:</strong> 12:30 PM</div>
+        <div><strong>Location:</strong> Chatham, Kent</div>
+      </div>
+      <button class="reschedule-btn" onclick="openReschedule()">Reschedule</button>
+    </div>
+  </main>
+
+  <aside id="rescheduleModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeReschedule()">&times;</button>
+      <h2>Reschedule</h2>
+      <form>
+        <label>New Date</label>
+        <input type="date" required />
+        <label>New Time</label>
+        <input type="time" required />
+        <button>Confirm</button>
+      </form>
+    </div>
+  </aside>
+
+  <script>
+    function openReschedule() {
+      document.getElementById('rescheduleModal').classList.remove('hidden');
+    }
+    function closeReschedule() {
+      document.getElementById('rescheduleModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
