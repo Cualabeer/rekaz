@@ -5,226 +5,203 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AutoX Services</title>
   <link rel="stylesheet" href="shared/global.css" />
+  <style>
+    /* Blur page behind modal */
+    body.modal-open > *:not(#authModal) {
+      filter: blur(5px);
+      pointer-events: none;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
-  <!-- Dark Mode Toggle -->
-  <button id="darkModeToggle" class="dark-toggle" aria-label="Toggle Dark Mode">🌙</button>
+  <header class="site-header" role="banner">
+    <h1>AutoX Services</h1>
+    <img
+      src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg"
+      alt="AutoX Banner"
+      class="header-image"
+      loading="lazy"
+    />
+  </header>
 
-  <!-- Page Content -->
-  <div id="pageContent">
-    <header class="site-header">
-      <h1>AutoX Services</h1>
-      <img
-        src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg"
-        alt="AutoX Banner"
-        class="header-image"
-      />
-    </header>
+  <main class="services-container" role="main" aria-label="Service selection">
+    <div class="service-card" data-service="Recovery" tabindex="0" role="button" aria-pressed="false">🚗 Recovery</div>
+    <div class="service-card" data-service="Battery" tabindex="0" role="button" aria-pressed="false">🔋 Battery Fitting</div>
+    <div class="service-card" data-service="Service" tabindex="0" role="button" aria-pressed="false">🛠️ Full Service</div>
+    <div class="service-card" data-service="Brakes" tabindex="0" role="button" aria-pressed="false">🛑 Brake Check</div>
+    <div class="service-card" data-service="AC" tabindex="0" role="button" aria-pressed="false">❄️ AC Diagnostics</div>
+  </main>
 
-    <main class="services-container">
-      <div class="service-card" data-service="Recovery">🚗 Recovery</div>
-      <div class="service-card" data-service="Battery">🔋 Battery Fitting</div>
-      <div class="service-card" data-service="Service">🛠️ Full Service</div>
-      <div class="service-card" data-service="Brakes">🛑 Brake Check</div>
-      <div class="service-card" data-service="AC">❄️ AC Diagnostics</div>
-    </main>
-  </div>
+  <!-- Email Verification Modal -->
+  <div
+    id="authModal"
+    class="modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="authTitle"
+    aria-describedby="authDesc"
+  >
+    <div class="modal-content" role="document" tabindex="0">
+      <button
+        class="close-btn"
+        id="closeModalBtn"
+        aria-label="Close modal"
+        title="Close modal"
+      >&times;</button>
 
-  <!-- Email Login/Register Modal -->
-  <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content slide-up">
-      <button class="close-btn" id="closeModalBtn" aria-label="Close modal">&times;</button>
       <h2 id="authTitle">Login</h2>
-      <form id="authForm">
+      <p id="authDesc" class="visually-hidden">Enter your email to receive a verification code.</p>
+
+      <!-- Step 1: Enter Email -->
+      <form id="authFormStep1" novalidate>
         <label for="email">Email address:</label>
-        <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required />
-        <p class="email-feedback" id="emailFeedback"></p>
-        <button type="submit" id="authSubmit">Send Code</button>
-        <p class="note">We'll email you a 6-digit code.</p>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+          aria-required="true"
+          aria-describedby="emailHelp"
+        />
+        <small id="emailHelp">We'll email you a 6-digit code.</small>
+        <button type="submit" id="sendCodeBtn">Send Code</button>
       </form>
-      <div class="auth-switch">
-        <p id="authSwitchText">Don't have an account?</p>
-        <button id="authSwitchBtn" type="button">Register</button>
-      </div>
+
+      <!-- Step 2: Enter 6-digit Code -->
+      <form id="authFormStep2" class="hidden" novalidate>
+        <label for="code">Enter verification code:</label>
+        <input
+          type="text"
+          id="code"
+          name="code"
+          maxlength="6"
+          pattern="\\d{6}"
+          placeholder="6-digit code"
+          required
+          aria-required="true"
+          aria-describedby="codeHelp"
+          inputmode="numeric"
+        />
+        <small id="codeHelp">Check your email for the code.</small>
+        <button type="submit" id="verifyCodeBtn">Verify Code</button>
+      </form>
     </div>
   </div>
 
-  <!-- Verification Modal -->
-  <div id="verifyModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="verifyTitle">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content slide-up">
-      <button class="close-btn" id="closeVerifyModalBtn" aria-label="Close modal">&times;</button>
-      <h2 id="verifyTitle">Enter Verification Code</h2>
-      <form id="verifyForm">
-        <label for="codeInput">6-digit code:</label>
-        <input type="text" id="codeInput" name="codeInput" placeholder="Enter code" maxlength="6" pattern="\d{6}" required />
-        <button type="submit" id="verifySubmit">Verify Code</button>
-      </form>
-      <p class="note">Please check your email for the code.</p>
-    </div>
-  </div>
+<script>
+  /* === Frontend JS: Auth modal and verification === */
 
-  <!-- Toast Notifications -->
-  <div id="toastContainer" class="toast-container"></div>
+  const authModal = document.getElementById('authModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const authFormStep1 = document.getElementById('authFormStep1');
+  const authFormStep2 = document.getElementById('authFormStep2');
+  const emailInput = document.getElementById('email');
+  const codeInput = document.getElementById('code');
 
-  <!-- Loading Spinner -->
-  <div id="loadingSpinner" class="spinner hidden" aria-hidden="true"></div>
+  // Change this to your backend deployment URL (Railway or your server)
+  const BACKEND_URL = 'https://your-railway-app-url.up.railway.app';
 
-  <!-- Scripts -->
-  <script>
-    // === State & Elements ===
-    const authModal = document.getElementById('authModal');
-    const verifyModal = document.getElementById('verifyModal');
-    const cards = document.querySelectorAll('.service-card');
-    const authForm = document.getElementById('authForm');
-    const verifyForm = document.getElementById('verifyForm');
-    const emailInput = document.getElementById('email');
-    const emailFeedback = document.getElementById('emailFeedback');
-    const spinner = document.getElementById('loadingSpinner');
-    const darkToggle = document.getElementById('darkModeToggle');
+  let userEmail = null; // store email between steps
 
-    let selectedService = null;
-    let isRegistering = false;
-    let currentEmail = '';
+  // Show modal and reset forms
+  function openModal() {
+    authModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    authFormStep1.reset();
+    authFormStep2.reset();
+    authFormStep1.classList.remove('hidden');
+    authFormStep2.classList.add('hidden');
+    emailInput.focus();
+  }
 
-    // === Toast Notification ===
-    function showToast(message, type = 'info') {
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-      document.getElementById('toastContainer').appendChild(toast);
-      setTimeout(() => {
-        toast.classList.add('hide');
-        toast.addEventListener('transitionend', () => toast.remove());
-      }, 3000);
-    }
+  // Hide modal
+  function closeModal() {
+    authModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
 
-    // === Loading Spinner ===
-    function toggleSpinner(show) {
-      spinner.classList.toggle('hidden', !show);
-    }
+  // Close button event
+  closeModalBtn.addEventListener('click', closeModal);
 
-    // === Modal Controls ===
-    function closeModal(modal) {
-      modal.classList.add('hidden');
-      document.body.classList.remove('modal-open');
-    }
-
-    document.getElementById('closeModalBtn').onclick = () => closeModal(authModal);
-    document.getElementById('closeVerifyModalBtn').onclick = () => closeModal(verifyModal);
-    authModal.querySelector('.modal-backdrop').onclick = () => closeModal(authModal);
-    verifyModal.querySelector('.modal-backdrop').onclick = () => closeModal(verifyModal);
-
-    // === Card Animations on Scroll ===
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-in');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-
-    cards.forEach(card => {
-      observer.observe(card);
-      card.addEventListener('click', () => {
-        selectedService = card.dataset.service;
-        authModal.classList.remove('hidden');
-        document.body.classList.add('modal-open');
-      });
-    });
-
-    // === Email Live Validation ===
-    emailInput.addEventListener('input', () => {
-      const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
-      emailFeedback.textContent = isValid ? '✓ Valid email' : '';
-      emailFeedback.style.color = isValid ? 'green' : '';
-    });
-
-    // === Toggle Login/Register Mode ===
-    document.getElementById('authSwitchBtn').addEventListener('click', () => {
-      isRegistering = !isRegistering;
-      document.getElementById('authTitle').textContent = isRegistering ? 'Register' : 'Login';
-      document.getElementById('authSubmit').textContent = isRegistering ? 'Register & Send Code' : 'Send Code';
-      document.getElementById('authSwitchText').textContent = isRegistering ? 'Already have an account?' : "Don't have an account?";
-      document.getElementById('authSwitchBtn').textContent = isRegistering ? 'Login' : 'Register';
-    });
-
-    // === Send Email Code ===
-    authForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = emailInput.value.trim();
-      if (!email) return showToast('Please enter a valid email.', 'error');
-
-      try {
-        toggleSpinner(true);
-        const res = await fetch('http://localhost:3000/api/send-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, register: isRegistering })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          showToast(`Code sent to ${email}`, 'success');
-          currentEmail = email;
-          authModal.classList.add('hidden');
-          verifyModal.classList.remove('hidden');
-        } else {
-          showToast(data.error || 'Error sending code.', 'error');
-        }
-      } catch {
-        showToast('Network error. Try again.', 'error');
-      } finally {
-        toggleSpinner(false);
+  // Accessibility: open modal on Enter/Space key for service cards
+  document.querySelectorAll('.service-card').forEach(card => {
+    card.addEventListener('click', openModal);
+    card.addEventListener('keypress', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openModal();
       }
     });
+  });
 
-    // === Verify 6-digit Code ===
-    verifyForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const code = document.getElementById('codeInput').value.trim();
-      if (!/^\d{6}$/.test(code)) return showToast('Invalid code format.', 'error');
+  // Step 1: Send verification code to email
+  authFormStep1.addEventListener('submit', async e => {
+    e.preventDefault();
 
-      try {
-        toggleSpinner(true);
-        const res = await fetch('http://localhost:3000/api/verify-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: currentEmail, code })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          showToast('Verified! You are now logged in.', 'success');
-          verifyModal.classList.add('hidden');
-        } else {
-          showToast(data.error || 'Invalid code.', 'error');
-        }
-      } catch {
-        showToast('Could not verify code.', 'error');
-      } finally {
-        toggleSpinner(false);
+    const email = emailInput.value.trim();
+    if (!email) {
+      alert('Please enter a valid email address.');
+      emailInput.focus();
+      return;
+    }
+    userEmail = email;
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/send-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(`Verification code sent to ${email}. Please check your email.`);
+        authFormStep1.classList.add('hidden');
+        authFormStep2.classList.remove('hidden');
+        codeInput.focus();
+      } else {
+        alert(result.error || 'Failed to send verification code.');
       }
-    });
+    } catch {
+      alert('Network error. Please try again later.');
+    }
+  });
 
-    // === Dark Mode Toggle ===
-    const darkModeClass = 'dark-mode';
-    function setDarkMode(enabled) {
-      document.body.classList.toggle(darkModeClass, enabled);
-      localStorage.setItem('darkMode', enabled ? 'true' : 'false');
-      darkToggle.textContent = enabled ? '☀️' : '🌙';
+  // Step 2: Verify the 6-digit code
+  authFormStep2.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const code = codeInput.value.trim();
+    if (!/^\d{6}$/.test(code)) {
+      alert('Please enter a valid 6-digit code.');
+      codeInput.focus();
+      return;
     }
 
-    darkToggle.addEventListener('click', () => {
-      const enabled = document.body.classList.toggle(darkModeClass);
-      setDarkMode(enabled);
-    });
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/verify-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, code })
+      });
+      const result = await response.json();
 
-    // Apply dark mode on load
-    window.addEventListener('DOMContentLoaded', () => {
-      const darkPref = localStorage.getItem('darkMode') === 'true';
-      setDarkMode(darkPref);
-    });
-  </script>
+      if (response.ok) {
+        alert('Email verified successfully! You are now logged in.');
+        closeModal();
+        // TODO: Trigger further logged-in actions here
+      } else {
+        alert(result.error || 'Verification failed. Please try again.');
+        codeInput.focus();
+      }
+    } catch {
+      alert('Network error. Please try again later.');
+    }
+  });
+</script>
+
 </body>
 </html>
