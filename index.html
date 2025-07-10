@@ -3,205 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AutoX Services</title>
+  <title>AutoX Services — Quick Login & Service Booking</title>
   <link rel="stylesheet" href="shared/global.css" />
-  <style>
-    /* Blur page behind modal */
-    body.modal-open > *:not(#authModal) {
-      filter: blur(5px);
-      pointer-events: none;
-      user-select: none;
-    }
-  </style>
+  <meta name="description" content="AutoX - Book vehicle recovery, battery fitting, servicing, brake checks, and AC diagnostics easily. Secure login via email verification code." />
+  <link rel="icon" href="shared/favicon.ico" />
 </head>
 <body>
-  <header class="site-header" role="banner">
+  <header class="site-header container" role="banner">
     <h1>AutoX Services</h1>
-    <img
-      src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg"
-      alt="AutoX Banner"
-      class="header-image"
-      loading="lazy"
-    />
+    <img src="shared/42B34D58-F7E8-43C4-AC8F-6F05AF04864A.jpeg" alt="AutoX banner image" class="header-image" />
   </header>
 
-  <main class="services-container" role="main" aria-label="Service selection">
-    <div class="service-card" data-service="Recovery" tabindex="0" role="button" aria-pressed="false">🚗 Recovery</div>
-    <div class="service-card" data-service="Battery" tabindex="0" role="button" aria-pressed="false">🔋 Battery Fitting</div>
-    <div class="service-card" data-service="Service" tabindex="0" role="button" aria-pressed="false">🛠️ Full Service</div>
-    <div class="service-card" data-service="Brakes" tabindex="0" role="button" aria-pressed="false">🛑 Brake Check</div>
-    <div class="service-card" data-service="AC" tabindex="0" role="button" aria-pressed="false">❄️ AC Diagnostics</div>
+  <main class="container" role="main">
+    <section class="services-container" aria-label="Select a service">
+      <button class="service-card" data-service="Recovery" type="button" aria-pressed="false">🚗 Recovery</button>
+      <button class="service-card" data-service="Battery" type="button" aria-pressed="false">🔋 Battery Fitting</button>
+      <button class="service-card" data-service="Service" type="button" aria-pressed="false">🛠️ Full Service</button>
+      <button class="service-card" data-service="Brakes" type="button" aria-pressed="false">🛑 Brake Check</button>
+      <button class="service-card" data-service="AC" type="button" aria-pressed="false">❄️ AC Diagnostics</button>
+    </section>
   </main>
 
-  <!-- Email Verification Modal -->
-  <div
-    id="authModal"
-    class="modal hidden"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="authTitle"
-    aria-describedby="authDesc"
-  >
-    <div class="modal-content" role="document" tabindex="0">
-      <button
-        class="close-btn"
-        id="closeModalBtn"
-        aria-label="Close modal"
-        title="Close modal"
-      >&times;</button>
-
+  <!-- Login/Register Modal -->
+  <aside id="authModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle" tabindex="-1" hidden>
+    <div class="modal-content" role="document">
+      <button class="close-btn" id="closeModalBtn" aria-label="Close login modal">&times;</button>
       <h2 id="authTitle">Login</h2>
-      <p id="authDesc" class="visually-hidden">Enter your email to receive a verification code.</p>
-
-      <!-- Step 1: Enter Email -->
-      <form id="authFormStep1" novalidate>
-        <label for="email">Email address:</label>
+      <form id="authForm" novalidate>
+        <label for="emailInput">Email address</label>
         <input
           type="email"
-          id="email"
+          id="emailInput"
           name="email"
           placeholder="you@example.com"
           autocomplete="email"
           required
           aria-required="true"
-          aria-describedby="emailHelp"
         />
-        <small id="emailHelp">We'll email you a 6-digit code.</small>
-        <button type="submit" id="sendCodeBtn">Send Code</button>
+        <button type="submit" id="authSubmitBtn">Send Code</button>
+        <p class="note">We'll email you a 6-digit code to verify your account.</p>
       </form>
-
-      <!-- Step 2: Enter 6-digit Code -->
-      <form id="authFormStep2" class="hidden" novalidate>
-        <label for="code">Enter verification code:</label>
-        <input
-          type="text"
-          id="code"
-          name="code"
-          maxlength="6"
-          pattern="\\d{6}"
-          placeholder="6-digit code"
-          required
-          aria-required="true"
-          aria-describedby="codeHelp"
-          inputmode="numeric"
-        />
-        <small id="codeHelp">Check your email for the code.</small>
-        <button type="submit" id="verifyCodeBtn">Verify Code</button>
-      </form>
+      <div class="auth-switch">
+        <p id="authSwitchText">Don't have an account?</p>
+        <button id="authSwitchBtn" type="button">Register</button>
+      </div>
     </div>
-  </div>
+  </aside>
 
-<script>
-  /* === Frontend JS: Auth modal and verification === */
+  <!-- Toast notification container -->
+  <div id="toast" role="alert" aria-live="assertive" aria-atomic="true" class="toast" hidden></div>
 
-  const authModal = document.getElementById('authModal');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const authFormStep1 = document.getElementById('authFormStep1');
-  const authFormStep2 = document.getElementById('authFormStep2');
-  const emailInput = document.getElementById('email');
-  const codeInput = document.getElementById('code');
-
-  // Change this to your backend deployment URL (Railway or your server)
-  const BACKEND_URL = 'https://your-railway-app-url.up.railway.app';
-
-  let userEmail = null; // store email between steps
-
-  // Show modal and reset forms
-  function openModal() {
-    authModal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
-    authFormStep1.reset();
-    authFormStep2.reset();
-    authFormStep1.classList.remove('hidden');
-    authFormStep2.classList.add('hidden');
-    emailInput.focus();
-  }
-
-  // Hide modal
-  function closeModal() {
-    authModal.classList.add('hidden');
-    document.body.classList.remove('modal-open');
-  }
-
-  // Close button event
-  closeModalBtn.addEventListener('click', closeModal);
-
-  // Accessibility: open modal on Enter/Space key for service cards
-  document.querySelectorAll('.service-card').forEach(card => {
-    card.addEventListener('click', openModal);
-    card.addEventListener('keypress', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        openModal();
-      }
-    });
-  });
-
-  // Step 1: Send verification code to email
-  authFormStep1.addEventListener('submit', async e => {
-    e.preventDefault();
-
-    const email = emailInput.value.trim();
-    if (!email) {
-      alert('Please enter a valid email address.');
-      emailInput.focus();
-      return;
+  <!-- Lazy-load auth-modal.js on demand -->
+  <script>
+    const serviceButtons = document.querySelectorAll('.service-card');
+    let authScriptLoaded = false;
+    function loadAuthScript() {
+      if (authScriptLoaded) return;
+      authScriptLoaded = true;
+      const script = document.createElement('script');
+      script.src = 'shared/js/auth-modal.js';
+      document.body.appendChild(script);
     }
-    userEmail = email;
-
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/send-code`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(`Verification code sent to ${email}. Please check your email.`);
-        authFormStep1.classList.add('hidden');
-        authFormStep2.classList.remove('hidden');
-        codeInput.focus();
-      } else {
-        alert(result.error || 'Failed to send verification code.');
-      }
-    } catch {
-      alert('Network error. Please try again later.');
-    }
-  });
-
-  // Step 2: Verify the 6-digit code
-  authFormStep2.addEventListener('submit', async e => {
-    e.preventDefault();
-
-    const code = codeInput.value.trim();
-    if (!/^\d{6}$/.test(code)) {
-      alert('Please enter a valid 6-digit code.');
-      codeInput.focus();
-      return;
-    }
-
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/verify-code`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail, code })
-      });
-      const result = await response.json();
-
-      if (response.ok) {
-        alert('Email verified successfully! You are now logged in.');
-        closeModal();
-        // TODO: Trigger further logged-in actions here
-      } else {
-        alert(result.error || 'Verification failed. Please try again.');
-        codeInput.focus();
-      }
-    } catch {
-      alert('Network error. Please try again later.');
-    }
-  });
-</script>
-
+    serviceButtons.forEach(btn => btn.addEventListener('click', loadAuthScript, { once: true }));
+  </script>
 </body>
 </html>
